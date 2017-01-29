@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="MainActivity">
+
+    <TextView
+        android:text="Introducir Tlfno:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="30dp"
+        android:id="@+id/txtTlfno" />
+
+    <TextView
+        android:text="Introducir mensaje:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTlfno"
+        android:layout_alignStart="@+id/txtTlfno"
+        android:layout_marginTop="22dp"
+        android:id="@+id/txtSMS" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="Name"
+        android:ems="10"
+        android:layout_below="@+id/txtSMS"
+        android:layout_alignStart="@+id/txtSMS"
+        android:layout_marginTop="22dp"
+        android:id="@+id/editSMS" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:ems="10"
+        android:layout_marginTop="17dp"
+        android:id="@+id/editTlfno"
+        android:layout_below="@+id/txtTlfno"
+        android:layout_alignStart="@+id/txtSMS" />
+
+    <Button
+        android:text="Enviar SMS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editSMS"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="55dp"
+        android:id="@+id/btnSMS" />
+</RelativeLayout>
