@@ -1,91 +1,127 @@
 package com.example.polga.app_final;
 
-        import android.Manifest;
-        import android.content.ContentResolver;
-        import android.content.pm.PackageManager;
-        import android.database.Cursor;
-        import android.net.Uri;
-        import android.support.v4.app.ActivityCompat;
-        import android.support.v7.app.AppCompatActivity;
-        import android.os.Bundle;
-        import android.view.View;
-        import android.widget.Button;
-        import android.view.View.OnClickListener;
-        import android.provider.CallLog.Calls;
-        import android.widget.TextView;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.provider.CallLog;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Content extends AppCompatActivity {
-    private Button btnLlamadas;
-    private TextView txtResultados;
+
+    private static final String TODO="";
+    Button btnMostrar;
+    TextView txtMostrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_content);
 
-        btnLlamadas = (Button) findViewById(R.id.btnMostrar);
-        txtResultados = (TextView) findViewById(R.id.txtView);
+        btnMostrar = (Button) findViewById(R.id.btnMostrar);
 
-        btnLlamadas.setOnClickListener(new OnClickListener() {
-
+        btnMostrar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
-
-                String[] projection = new String[]{
-                        Calls.TYPE,
-                        Calls.NUMBER,
-                        Calls.DURATION,
-                        Calls.DATE};
-
-                Uri llamadasUri = Calls.CONTENT_URI;
-
-                ContentResolver cr = getContentResolver();
-
-                if (ActivityCompat.checkSelfPermission(Content.this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-
-                    return;
-                }
-                Cursor cur = cr.query(llamadasUri,
-                        projection, //Columnas a devolver
-                        null,       //Condición de la query
-                        null,       //Argumentos variables de la query
-                        null);      //Orden de los resultados
-
-                if (cur.moveToFirst())
-                {
-                    int tipo;
-                    String tipoLlamada = "";
-                    String telefono;
-                    String duracion;
-                    String fecha;
-
-                    int colTipo = cur.getColumnIndex(Calls.TYPE);
-                    int colTelefono = cur.getColumnIndex(Calls.NUMBER);
-                    int colDuracion = cur.getColumnIndex(Calls.DURATION);
-                    int colFecha = cur.getColumnIndex(Calls.DATE);
-
-                    txtResultados.setText("");
-
-                    do
-                    {
-
-                        tipo = cur.getInt(colTipo);
-                        telefono = cur.getString(colTelefono);
-                        duracion = cur.getString(colDuracion);
-                        fecha = cur.getString(colFecha);
-
-                        if(tipo == Calls.INCOMING_TYPE)
-                            tipoLlamada = "ENTRADA";
-                        else if(tipo == Calls.OUTGOING_TYPE)
-                            tipoLlamada = "SALIDA";
-                        else if(tipo == Calls.MISSED_TYPE)
-                            tipoLlamada = "PERDIDA";
-
-                        txtResultados.append(tipoLlamada + " - " + telefono + " - "+duracion+" - "+fecha+ "\n");
-
-                    } while (cur.moveToNext());
-                }
+            public void onClick(View v) {
+                prova();
             }
         });
+
+    }
+
+    //Quan apretem el botó, s'executa el mètode
+    public void prova() {
+        if (ContextCompat.checkSelfPermission(Content.this,
+                Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            //Comprova que té permisos
+            if (ActivityCompat.shouldShowRequestPermissionRationale(Content.this,
+                    Manifest.permission.READ_CALL_LOG)) {
+                ActivityCompat.requestPermissions(Content.this,
+                        new String[]{Manifest.permission.READ_CALL_LOG}, 1);
+            } else {
+                ActivityCompat.requestPermissions(Content.this,
+                        new String[]{Manifest.permission.READ_CALL_LOG}, 1);
+            }
+        } else {
+            TextView textView = (TextView) findViewById(R.id.txtMostrar);
+            textView.setText(getCallDetails());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(Content.this,
+                            Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, "Permisos concedits", Toast.LENGTH_LONG).show();
+                        TextView textView = (TextView) findViewById(R.id.txtMostrar);
+                        textView.setText(getCallDetails());
+                    }
+                } else {
+                    Toast.makeText(this, "No s'han concedit permisos", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
+    private String getCallDetails() {
+        StringBuffer sb = new StringBuffer();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return TODO;
+        }
+        Cursor managedCursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
+        //Recull les dades necessaries
+        int number =managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
+        int type =managedCursor.getColumnIndex(CallLog.Calls.TYPE);
+        int date =managedCursor.getColumnIndex(CallLog.Calls.DATE);
+        int duration =managedCursor.getColumnIndex(CallLog.Calls.DURATION);
+        sb.append("Trucades:\n\n");
+        while(managedCursor.moveToNext()){
+            String phNumber=managedCursor.getString(number);
+            String callType=managedCursor.getString(type);
+            String callDate=managedCursor.getString(date);
+            Date callDayTime = new Date(Long.valueOf(callDate));
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yy HH:mm");
+            String dateString = formatter.format(callDayTime);
+            String callDuration = managedCursor.getString(duration);
+            String dir=null;
+            int dircode=Integer.parseInt(callType);
+            switch(dircode){
+                case CallLog.Calls.OUTGOING_TYPE:
+                    dir="SORTIDA";
+                    break;
+                case CallLog.Calls.INCOMING_TYPE:
+                    dir="ENTRADA";
+                    break;
+                case CallLog.Calls.MISSED_TYPE:
+                    dir="PERDUDA";
+                    break;
+            }
+            //Mostra les dades
+            sb.append("\nNúmero de telèfon: "+phNumber+" \nTipus de trucada: "+dir+"\nDia de la trucada: "+dateString+
+                    " \nDuració: "+callDuration);
+            sb.append("\n--------------------------------");
+        }
+        managedCursor.close();
+        return sb.toString();
     }
 }
